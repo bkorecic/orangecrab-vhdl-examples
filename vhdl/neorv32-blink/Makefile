@@ -5,7 +5,7 @@ VERSION := r0.2.1
 # `25F` or `85F`
 DENSITY := 85F
 
-NEORV32_CORE_DIR = neorv32/rtl/core
+NEORV32_CORE_DIR = ../neorv32/rtl/core
 
 # We need the files to be analyzed in a specific order
 NEORV32_FILES = $(NEORV32_CORE_DIR)/neorv32_package.vhd \
