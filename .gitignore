@@ -12,3 +12,6 @@ abc.history
 litex/build*
 
 tmp/
+
+# Intermediate files in VHDL->Yosys build pipeline
+*.cf
