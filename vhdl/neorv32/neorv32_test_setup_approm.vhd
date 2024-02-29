@@ -49,11 +49,13 @@ entity neorv32_test_setup_approm is
   port (
     -- Global control --
     clk48      : in  std_ulogic; -- global clock, rising edge
-    rst_n      : in  std_ulogic; -- global reset, low-active, async
+    usr_btn    : in  std_ulogic; -- global reset, low-active, async
     -- GPIO --
-    gpio_0     : out std_ulogic_vector(7 downto 0); -- parallel output
+    -- gpio_0     : out std_ulogic_vector(7 downto 0); -- parallel output
     -- LED --
-    rgb_led0_r : out std_logic -- LED red channel
+    rgb_led0_r : out std_logic; -- red channel
+    rgb_led0_g : out std_logic; -- green channel
+    rgb_led0_b : out std_logic  -- blue channel
   );
 end entity;
 
@@ -87,14 +89,15 @@ begin
   port map (
     -- Global control --
     clk_i  => clk48,     -- global clock, rising edge
-    rstn_i => rst_n,     -- global reset, low-active, async
+    rstn_i => usr_btn,   -- global reset, low-active, async
     -- GPIO (available if IO_GPIO_NUM > 0) --
     gpio_o => con_gpio_o -- parallel output
   );
 
   -- GPIO output --
-  gpio_0 <= con_gpio_o(7 downto 0);
+  -- gpio_0 <= con_gpio_o(7 downto 0);
   rgb_led0_r <= not con_gpio_o(0);
-
+  rgb_led0_g <= '1';
+  rgb_led0_b <= '1';
 
 end architecture;

@@ -5,7 +5,7 @@ VERSION := r0.2.1
 # `25F` or `85F`
 DENSITY := 85F
 
-NEORV32_CORE_DIR = neorv32-1.9.5/rtl/core
+NEORV32_CORE_DIR = neorv32/rtl/core
 
 # We need the files to be analyzed in a specific order
 NEORV32_FILES = $(NEORV32_CORE_DIR)/neorv32_package.vhd \
@@ -82,8 +82,10 @@ all: $(PROJ).dfu
 %.vhd: ;
 
 %.cf: %.vhd
-	ghdl -a -o $(CURDIR) --work=neorv32 $(NEORV32_FILES)
-	ghdl -a -o $(CURDIR) $(PROJ).vhd
+	ghdl -a --work=neorv32 $(NEORV32_FILES)
+	ghdl -a $(PROJ).vhd
+	ghdl clean --work=neorv32
+	ghdl clean
 
 # Build the yosys script.
 # This recipe depends on the actual VHDL files (defined in $(PROJ_FILES))
@@ -95,11 +97,11 @@ all: $(PROJ).dfu
 	$(file >>$@,ghdl -a $(TOP_MODULE).vhd)
 	$(file >>$@,ghdl -e $(TOP_MODULE))
 
-%.json: %.ys
-	yosys -m ghdl -s "$<"
+%.json: %.cf
+	yosys -m ghdl -p "ghdl $(PROJ); synth_ecp5 -json $@"
 
 %_out.config: %.json
-	nextpnr-ecp5 --json $< --textcfg $@ $(NEXTPNR_DENSITY) --package CSFBGA285 --lpf orangecrab_${VERSION}.pcf
+	nextpnr-ecp5 --json $< --textcfg $@ $(NEXTPNR_DENSITY) --package CSFBGA285 --lpf ../orangecrab_${VERSION}.pcf
 
 %.bit: %_out.config
 	ecppack --compress --freq 38.8 --input $< --bit $@
@@ -110,3 +112,5 @@ all: $(PROJ).dfu
 
 clean:
 	rm -f ${PROJ}.bit ${PROJ}_out.config ${PROJ}.json ${PROJ}.dfu
+	ghdl remove
+	ghdl remove --work=neorv32
